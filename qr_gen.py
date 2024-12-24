@@ -52,7 +52,7 @@ def create_video(output_path: str, frame_filenames: list, fps: int):
 def random_shuffle_frames(qr_codes: list, num_shuffles: int):
     qr_codes_cpy = [i for i in qr_codes]
     for i in range(0, num_shuffles):
-        idx1, idx2 = random.sample(range(len(qr_codes_cpy)), 2)
+        idx1, idx2 = random.sample(range(1, len(qr_codes_cpy)), 2)
         print(f"Switching frames {idx1} and {idx2}")
         qr_codes_cpy[idx1], qr_codes_cpy[idx2] = qr_codes_cpy[idx2], qr_codes_cpy[idx1]
 
