@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import cv2
 import os
 import qrcode
@@ -9,9 +10,8 @@ import random
 
 VID_DIMENSIONS = (500, 500)
 SAVE_DIR = "qr_frames"
-VIDEO_NAME = "qr_codes_out_of_order.avi"
 
-def qr_gen(num_frames: int):
+def generate_qr_codes(num_frames: int):
     qr_codes = []
 
     os.makedirs(SAVE_DIR, exist_ok=True)
@@ -37,27 +37,41 @@ def qr_gen(num_frames: int):
     return qr_codes
 
 
-def create_video(frame_filenames: list, fps: int):
+def create_video(output_path: str, frame_filenames: list, fps: int):
     fourcc = cv2.VideoWriter_fourcc(*"XVID")
-    video = cv2.VideoWriter(VIDEO_NAME, fourcc, fps, VID_DIMENSIONS)
+    video = cv2.VideoWriter(output_path, fourcc, fps, VID_DIMENSIONS)
     for frame_path in frame_filenames:
         frame = cv2.imread(frame_path)
         video.write(frame)
     video.release()
 
 
-def shuffle_frames(qr_codes: list, num_shuffles: int):
+def random_shuffle_frames(qr_codes: list, num_shuffles: int):
     qr_codes_cpy = [i for i in qr_codes]
-
     for i in range(0, num_shuffles):
         idx1, idx2 = random.sample(range(len(qr_codes_cpy)), 2)
-        print(f"idx1 = {idx1}, idx2 = {idx2}")
+        print(f"Switching frames {idx1} and {idx2}")
         qr_codes_cpy[idx1], qr_codes_cpy[idx2] = qr_codes_cpy[idx2], qr_codes_cpy[idx1]
 
     return qr_codes_cpy
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+            prog="QR Code Video Generator",
+            description="Create a small video that contains QR codes per frame")
+    parser.add_argument("num_frames",
+                        type=int,
+                        help="Total number of frames that the resulting video should have")
+    parser.add_argument("output_path",
+                        type=str,
+                        help="Path where to save the resulting output video")
+
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    qr_codes = qr_gen(60)
-    qr_codes = shuffle_frames(qr_codes, 6)
-    create_video(qr_codes, 60)
+    args = parse_args()
+    qr_codes = generate_qr_codes(args.num_frames)
+    #qr_codes = random_shuffle_frames(qr_codes, 6)
+    create_video(args.output_path, qr_codes, 60)
