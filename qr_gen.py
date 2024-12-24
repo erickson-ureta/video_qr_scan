@@ -13,7 +13,7 @@ VID_DIMENSIONS = (500, 500)
 SAVE_DIR = "qr_frames"
 DEFAULT_OUTPUT_FILE = "qr_video.avi"
 
-def generate_qr_codes(num_frames: int):
+def generate_qr_codes(num_frames: int, skip_sync_frame: bool) -> list:
     qr_codes = []
 
     os.makedirs(SAVE_DIR, exist_ok=True)
@@ -23,7 +23,10 @@ def generate_qr_codes(num_frames: int):
 
         qr_data = {}
         if i == 0:
-            qr_data["total_frames"] = num_frames
+            if skip_sync_frame:
+                print("Skipping sync frame")
+            else:
+                qr_data["total_frames"] = num_frames
         else:
             qr_data["frame_i"] = i
         qr.add_data(json.dumps(qr_data))
@@ -82,6 +85,9 @@ def parse_args():
     parser.add_argument("--delete_random", "-d",
                         type=int,
                         help="Randomly deletes frames around up to the specified amount. Must not be greater than the specified num_frames")
+    parser.add_argument("--skip_sync_frame", "-k",
+                        action="store_true",
+                        help="Add this flag to intentionally skip creating the first sync frame")
 
     args = parser.parse_args()
     if args.output_path and len(args.output_path) <= 0:
@@ -105,7 +111,7 @@ if __name__ == "__main__":
     if not args:
         sys.exit(1)
 
-    qr_codes = generate_qr_codes(args.num_frames)
+    qr_codes = generate_qr_codes(args.skip_sync_frame, args.num_frames)
     if args.scramble:
         qr_codes = random_shuffle_frames(qr_codes, args.scramble)
     if args.delete_random:

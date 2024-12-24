@@ -134,7 +134,7 @@ def print_results(total_frames: int, missing_frames: list, out_of_order_frames: 
 
     missing_frames_str = "None"
     if missing_frames:
-        missing_frames_str = ",".join([str(i) for i in missing_frames])
+        missing_frames_str = ", ".join([str(i) for i in missing_frames])
     print("Missing frames:")
     print(f"  {missing_frames_str}")
 
