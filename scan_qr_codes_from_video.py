@@ -50,8 +50,8 @@ def verify_frames_data(frames_data: list) -> bool:
     missing_frames = [i for i in range(1, total_frames)]
     out_of_order_frames = []
 
-    # Go through frame by frame
-    for i, frame in enumerate(frames_data[1:]):
+    # Go through frame by frame, starting from frame 2 (index 1)
+    for i, frame in enumerate(frames_data[1:], 1):
         frame_i = frame[FRAME_I]
         missing_frames.remove(frame_i)
         if i != frame_i:
@@ -78,6 +78,6 @@ def verify_frames_data(frames_data: list) -> bool:
     return True
 
 if __name__ == "__main__":
-    frames_data = scan_qr_codes("qr_codes.avi")
+    frames_data = scan_qr_codes("qr_video.avi")
     #frames_data = scan_qr_codes("qr_codes_out_of_order.avi")
     verify_frames_data(frames_data)

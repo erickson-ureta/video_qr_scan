@@ -7,6 +7,7 @@ import qrcode
 from PIL import Image
 import json
 import random
+import sys
 
 VID_DIMENSIONS = (500, 500)
 SAVE_DIR = "qr_frames"
@@ -66,12 +67,25 @@ def parse_args():
     parser.add_argument("output_path",
                         type=str,
                         help="Path where to save the resulting output video")
+    parser.add_argument("--scramble", "-s",
+                        type=int,
+                        help="Swaps frames around up to the specified amount. Must not be greater than the specified num_frames")
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.num_frames <= 0:
+        print("Error: num_frames must be a value above 0")
+        return None
+    if args.scramble and (args.scramble < 0 or args.scramble > args.num_frames):
+        print("Error: scramble must be a value between 0 and specified num_frames")
+        return None
+
+    return args
 
 
 if __name__ == "__main__":
     args = parse_args()
+    if not args:
+        sys.exit(1)
     qr_codes = generate_qr_codes(args.num_frames)
     #qr_codes = random_shuffle_frames(qr_codes, 6)
     create_video(args.output_path, qr_codes, 60)
