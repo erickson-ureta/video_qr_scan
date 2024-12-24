@@ -166,4 +166,5 @@ if __name__ == "__main__":
     args = parse_args()
     frames_data = scan_qr_codes(args.input_video)
     total_frames, missing_frames, out_of_order_frames = analyze_frames_data(frames_data)
-    print_results(total_frames, missing_frames, out_of_order_frames)
+    if total_frames > 0:
+        print_results(total_frames, missing_frames, out_of_order_frames)
