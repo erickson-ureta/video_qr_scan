@@ -34,7 +34,7 @@ def _read_sync_frame(sync_frame) -> (bool, int):
     return True, frames_data[0][TOTAL_FRAMES]
 
 
-def verify_frames_data(frames_data: list) -> bool:
+def analyze_frames_data(frames_data: list) -> bool:
     if not frames_data:
         print("Error: no frames found in input video.")
         return False
@@ -56,8 +56,8 @@ def verify_frames_data(frames_data: list) -> bool:
         missing_frames.remove(frame_i)
         if i != frame_i:
             ooo_info = {
-                EXPECTED_FRAME_I: i,
-                ACTUAL_FRAME_I: frame_i,
+                EXPECTED_FRAME_I: frame_i,
+                ACTUAL_FRAME_I: i,
             }
             out_of_order_frames.append(ooo_info)
 
@@ -79,5 +79,4 @@ def verify_frames_data(frames_data: list) -> bool:
 
 if __name__ == "__main__":
     frames_data = scan_qr_codes("qr_video.avi")
-    #frames_data = scan_qr_codes("qr_codes_out_of_order.avi")
-    verify_frames_data(frames_data)
+    analyze_frames_data(frames_data)

@@ -59,6 +59,13 @@ def random_shuffle_frames(qr_codes: list, num_shuffles: int):
     return qr_codes_cpy
 
 
+def random_delete_frames(qr_codes: list, num_deletes: int):
+    random_qr_codes_to_delete = set(random.sample(range(len(qr_codes)), num_deletes))
+    print(f"Deleted frames: {random_qr_codes_to_delete}")
+
+    return [qr for i, qr in enumerate(qr_codes) if i not in random_qr_codes_to_delete]
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
             prog="QR Code Video Generator",
@@ -71,7 +78,10 @@ def parse_args():
                         help="Path where to save the resulting output video")
     parser.add_argument("--scramble", "-s",
                         type=int,
-                        help="Swaps frames around up to the specified amount. Must not be greater than the specified num_frames")
+                        help="Swaps frames around up to the specified amount of times")
+    parser.add_argument("--delete_random", "-d",
+                        type=int,
+                        help="Randomly deletes frames around up to the specified amount. Must not be greater than the specified num_frames")
 
     args = parser.parse_args()
     if args.output_path and len(args.output_path) <= 0:
@@ -82,6 +92,9 @@ def parse_args():
         return None
     if args.scramble and args.scramble < 0:
         print("Error: scramble must be a value above 0")
+        return None
+    if args.delete_random and (args.delete_random < 0 or args.delete_random > args.num_frames):
+        print("Error: delete_random must be a value between 1 and the specified num_frames value")
         return None
 
     return args
@@ -95,6 +108,8 @@ if __name__ == "__main__":
     qr_codes = generate_qr_codes(args.num_frames)
     if args.scramble:
         qr_codes = random_shuffle_frames(qr_codes, args.scramble)
+    if args.delete_random:
+        qr_codes = random_delete_frames(qr_codes, args.delete_random)
 
     output_path = DEFAULT_OUTPUT_FILE if not args.output_path else args.output_path
     create_video(output_path, qr_codes, 60)
