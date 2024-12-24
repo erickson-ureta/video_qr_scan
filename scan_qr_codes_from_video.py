@@ -139,6 +139,7 @@ def print_results(total_frames: int, missing_frames: list, out_of_order_frames: 
     print(f"  {missing_frames_str}")
 
     out_of_order_frames_str = "None"
+    print("Out-of-order frames:")
     if out_of_order_frames:
         for frame in out_of_order_frames:
             expected_i = frame[EXPECTED_FRAME_I]
