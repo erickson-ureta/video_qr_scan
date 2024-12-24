@@ -11,6 +11,7 @@ import sys
 
 VID_DIMENSIONS = (500, 500)
 SAVE_DIR = "qr_frames"
+DEFAULT_OUTPUT_FILE = "qr_video.avi"
 
 def generate_qr_codes(num_frames: int):
     qr_codes = []
@@ -45,6 +46,7 @@ def create_video(output_path: str, frame_filenames: list, fps: int):
         frame = cv2.imread(frame_path)
         video.write(frame)
     video.release()
+    print(f"QR video file successfully written to: {output_path}")
 
 
 def random_shuffle_frames(qr_codes: list, num_shuffles: int):
@@ -64,7 +66,7 @@ def parse_args():
     parser.add_argument("num_frames",
                         type=int,
                         help="Total number of frames that the resulting video should have")
-    parser.add_argument("output_path",
+    parser.add_argument("--output_path", "-o",
                         type=str,
                         help="Path where to save the resulting output video")
     parser.add_argument("--scramble", "-s",
@@ -72,11 +74,14 @@ def parse_args():
                         help="Swaps frames around up to the specified amount. Must not be greater than the specified num_frames")
 
     args = parser.parse_args()
+    if args.output_path and len(args.output_path) <= 0:
+        print("Error: output_path must not be empty")
+        return None
     if args.num_frames <= 0:
         print("Error: num_frames must be a value above 0")
         return None
-    if args.scramble and (args.scramble < 0 or args.scramble > args.num_frames):
-        print("Error: scramble must be a value between 0 and specified num_frames")
+    if args.scramble and args.scramble < 0:
+        print("Error: scramble must be a value above 0")
         return None
 
     return args
@@ -86,6 +91,10 @@ if __name__ == "__main__":
     args = parse_args()
     if not args:
         sys.exit(1)
+
     qr_codes = generate_qr_codes(args.num_frames)
-    #qr_codes = random_shuffle_frames(qr_codes, 6)
-    create_video(args.output_path, qr_codes, 60)
+    if args.scramble:
+        qr_codes = random_shuffle_frames(qr_codes, args.scramble)
+
+    output_path = DEFAULT_OUTPUT_FILE if not args.output_path else args.output_path
+    create_video(output_path, qr_codes, 60)
